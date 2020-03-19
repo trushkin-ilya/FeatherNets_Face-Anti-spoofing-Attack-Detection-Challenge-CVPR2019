@@ -289,7 +289,7 @@ def validate(val_loader, model, criterion,epoch):
 
     end = time.time()
     with torch.no_grad():
-        for i, (input, target,depth_dirs) in enumerate(val_loader):
+        for i, (input, target) in enumerate(val_loader):
             with torch.no_grad():
                 input_var = Variable(input).float().to(device)
                 target_var = Variable(target).long().to(device)
@@ -313,12 +313,6 @@ def validate(val_loader, model, criterion,epoch):
                         result_list.append(preds[i_batch,1])
                         label_list.append(label[i_batch])
                         predicted_list.append(predicted[i_batch])
-                        if args.val_save:
-                            f = open('submission/{}_{}_{}_submission.txt'.format(time_stp, args.arch, epoch), 'a+')
-                            depth_dir = depth_dirs[i_batch].replace(os.getcwd() + '/data/','')
-                            rgb_dir = depth_dir.replace('depth','color')
-                            ir_dir = depth_dir.replace('depth','ir')
-                            f.write(rgb_dir + ' ' + depth_dir + ' '+ir_dir+' ' + str(preds[i_batch,1]) +'\n')
 
                 # measure elapsed time
                 batch_time.update(time.time() - end)
