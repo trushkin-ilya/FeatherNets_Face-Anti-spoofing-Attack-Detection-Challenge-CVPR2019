@@ -113,11 +113,13 @@ def main():
     else:
         model = models.__dict__[args.arch]()
     device = torch.device('cuda:' + str(args.gpus[0]) if torch.cuda.is_available() else "cpu")
-    str_input_size = '1x3x224x224'
+    str_input_size = '1x5x224x224'
     if args.summary: 
         input_size = tuple(int(x) for x in str_input_size.split('x'))
         stat(model,input_size)
         return
+
+    model.conv1 = conv_bn_relu(5, 64 // 2, stride=2)
     if USE_GPU:
         cudnn.benchmark = True
         torch.cuda.manual_seed_all(args.random_seed)
@@ -195,7 +197,6 @@ def main():
         return
     else:
         print(model)
-        model.module.conv1 = conv_bn_relu(5, 64 // 2, stride=2)
 
     for epoch in range(args.start_epoch, args.epochs):
         adjust_learning_rate(optimizer, epoch)
