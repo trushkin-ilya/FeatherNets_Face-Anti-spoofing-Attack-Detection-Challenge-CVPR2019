@@ -75,6 +75,7 @@ parser.add_argument('--every-decay', default=40, type=int, help='how many epoch 
 parser.add_argument('--fl-gamma', default=3, type=int, help='gamma for Focal Loss')
 parser.add_argument('--phase-ir', default=0, type=int, help='phare for IR')
 parser.add_argument('--data-dir', type=str, required=True)
+parser.add_argument('--protocol', type=int, required=True)
 
 best_prec1 = 0
 
@@ -167,14 +168,14 @@ def main():
     img_size = args.input_size
 
     ratio = 224.0 / float(img_size)
-    train_dataset = CasiaSurfDataset(protocol=1, dir=args.data_dir, mode='train', transform=transforms.Compose([
+    train_dataset = CasiaSurfDataset(protocol=args.protocol, dir=args.data_dir, mode='train', transform=transforms.Compose([
             transforms.RandomResizedCrop(img_size),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             ColorAugmentation(),
             # normalize,
         ]))
-    val_dataset = CasiaSurfDataset(protocol=1, dir=args.data_dir, mode='dev', transform=transforms.Compose([
+    val_dataset = CasiaSurfDataset(protocol=args.protocol, dir=args.data_dir, mode='dev', transform=transforms.Compose([
             transforms.Resize(int(256 * ratio)),
             transforms.CenterCrop(img_size),
             transforms.ToTensor(),
