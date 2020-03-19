@@ -27,3 +27,6 @@ config.*
 
 # Static libraries
 *.la
+
+
+.idea
