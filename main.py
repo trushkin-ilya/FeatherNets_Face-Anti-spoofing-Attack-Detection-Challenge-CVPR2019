@@ -119,7 +119,6 @@ def main():
         stat(model,input_size)
         return
 
-    model.conv1 = conv_bn_relu(5, 64 // 2, stride=2)
     if USE_GPU:
         cudnn.benchmark = True
         torch.cuda.manual_seed_all(args.random_seed)

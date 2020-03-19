@@ -1,4 +1,4 @@
-from .fishnet import fish
+from .fishnet import fish, conv_bn_relu
 import torch
 
 
@@ -20,12 +20,15 @@ def fishnet150(**kwargs):
     }
     cfg = {**net_cfg, **kwargs}
     model = fish(**cfg)
-    model = torch.nn.DataParallel(model)
+
     pretrained = True
     if pretrained:
         path = './checkpoints/pre-trainedModels/fishnet150_ckpt.tar'
         state_dict = torch.load(path, map_location='cuda' if torch.cuda.is_available() else 'cpu')
         model.load_state_dict(state_dict['state_dict'],strict=True)
+    model.conv1 = conv_bn_relu(5, 64 // 2, stride=2)
+
+    model = torch.nn.DataParallel(model)
     return model
 
 
