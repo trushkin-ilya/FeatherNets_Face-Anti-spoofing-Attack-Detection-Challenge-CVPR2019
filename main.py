@@ -292,7 +292,8 @@ def validate(val_loader, model, criterion,epoch):
     with torch.no_grad():
         for i, (input, target) in enumerate(val_loader):
             with torch.no_grad():
-                input_var = Variable(input).float().to(device)
+                big_input = torch.cat(input, dim=1)
+                input_var = Variable(big_input).float().to(device)
                 target_var = Variable(target).long().to(device)
 
                 # compute output
