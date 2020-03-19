@@ -26,6 +26,8 @@ import models
 from read_data import CASIA
 from losses import *
 from tools.benchmark import compute_speed, stat
+from face_anti_spoofer.datasets import CasiaSurfDataset
+
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith("__")
                      and callable(models.__dict__[name]))
@@ -74,6 +76,7 @@ parser.add_argument('--summary', default=False, type=bool,
 parser.add_argument('--every-decay', default=40, type=int, help='how many epoch decay the lr')
 parser.add_argument('--fl-gamma', default=3, type=int, help='gamma for Focal Loss')
 parser.add_argument('--phase-ir', default=0, type=int, help='phare for IR')
+parser.add_argument('--data-dir', type=str, required=True)
 
 best_prec1 = 0
 
@@ -160,25 +163,24 @@ def main():
     
 
     # Data loading code
-    normalize = transforms.Normalize(mean=[0.14300402, 0.1434545, 0.14277956],  ##accorcoding to casia-surf val to commpute
-                                     std=[0.10050353, 0.100842826, 0.10034215])
+    #normalize = transforms.Normalize(mean=[0.14300402, 0.1434545, 0.14277956],  ##accorcoding to casia-surf val to commpute
+     #                                std=[0.10050353, 0.100842826, 0.10034215])
     img_size = args.input_size
 
     ratio = 224.0 / float(img_size)
-    train_dataset = CASIA(
-        transforms.Compose([
+    train_dataset = CasiaSurfDataset(protocol=1, dir=args.data_dir, mode='train', transform=transforms.Compose([
             transforms.RandomResizedCrop(img_size),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             ColorAugmentation(),
-            normalize,
-        ]),phase_train=True)
-    val_dataset = CASIA( transforms.Compose([
-        transforms.Resize(int(256 * ratio)),
-        transforms.CenterCrop(img_size),
-        transforms.ToTensor(),
-        normalize,
-    ]),phase_train=False,phase_test=args.phase_test)
+            # normalize,
+        ]))
+    val_dataset = CasiaSurfDataset(protocol=1, dir=args.data_dir, mode='dev', transform=transforms.Compose([
+            transforms.Resize(int(256 * ratio)),
+            transforms.CenterCrop(img_size),
+            transforms.ToTensor(),
+            # normalize
+        ]))
 
     train_sampler = None
     val_sampler = None
@@ -195,6 +197,7 @@ def main():
         return
     else:
         print(model)
+        model.module.conv1 = model.module._conv_bn_relu(5, 64 // 2, stride=2)
 
     for epoch in range(args.start_epoch, args.epochs):
         adjust_learning_rate(optimizer, epoch)
@@ -234,7 +237,8 @@ def train(train_loader, model, criterion, optimizer, epoch):
     for i, (input, target) in enumerate(train_loader):
         # measure data loading time
         data_time.update(time.time() - end)
-        input_var = Variable(input).float().to(device)
+        big_input = torch.cat(input, dim=1)
+        input_var = Variable(big_input).float().to(device)
         target_var = Variable(target).long().to(device)
 
         # compute output
