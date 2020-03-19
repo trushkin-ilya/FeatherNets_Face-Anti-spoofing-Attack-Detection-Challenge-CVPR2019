@@ -264,7 +264,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
         lr = optimizer.param_groups[0]['lr']
 
         if i % args.print_freq == 0:
-            with open('logs/{}_{}.log'.format(time_stp, args.arch), 'a+') as flog:
+            with open('logs/{}_{}.log'.format(time_stp, args.arch), 'w+') as flog:
                 line = 'Epoch: [{0}][{1}/{2}]\t lr:{3:.5f}\t' \
                        'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t' \
                        'Loss {loss.val:.4f} ({loss.avg:.4f})\t' \
