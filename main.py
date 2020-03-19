@@ -11,7 +11,6 @@ import torch
 import random
 import numpy as np
 import torch.backends.cudnn as cudnn
-import torch.nn as nn
 import torch.optim
 import torch.utils.data
 import torchvision.transforms as transforms
@@ -20,10 +19,9 @@ from utils.data_aug import ColorAugmentation
 from torch.autograd.variable import Variable
 # sklearn libs
 from sklearn.metrics import confusion_matrix
-import pickle
 import roc
 import models
-from read_data import CASIA
+from models.fishnet import conv_bn_relu
 from losses import *
 from tools.benchmark import compute_speed, stat
 from face_anti_spoofer.datasets import CasiaSurfDataset
@@ -197,7 +195,7 @@ def main():
         return
     else:
         print(model)
-        model.module.conv1 = model.module._conv_bn_relu(5, 64 // 2, stride=2)
+        model.module.conv1 = conv_bn_relu(5, 64 // 2, stride=2)
 
     for epoch in range(args.start_epoch, args.epochs):
         adjust_learning_rate(optimizer, epoch)

@@ -183,6 +183,11 @@ class Fish(nn.Module):
         all_feat[0] = x
         return self._fish_forward(all_feat)
 
+def conv_bn_relu(in_ch, out_ch, stride=1):
+    return nn.Sequential(nn.Conv2d(in_ch, out_ch, kernel_size=3, padding=1, stride=stride, bias=False),
+                         nn.BatchNorm2d(out_ch),
+                         nn.ReLU(inplace=True))
+
 
 class FishNet(nn.Module):
     def __init__(self, block, **kwargs):
@@ -198,10 +203,7 @@ class FishNet(nn.Module):
         self.fish = Fish(block, **kwargs)
         self._init_weights()
 
-    def _conv_bn_relu(self, in_ch, out_ch, stride=1):
-        return nn.Sequential(nn.Conv2d(in_ch, out_ch, kernel_size=3, padding=1, stride=stride, bias=False),
-                             nn.BatchNorm2d(out_ch),
-                             nn.ReLU(inplace=True))
+
 
     def _init_weights(self):
         for m in self.modules():
