@@ -195,9 +195,9 @@ class FishNet(nn.Module):
 
         inplanes = kwargs['network_planes'][0]
         # resolution: 224x224
-        self.conv1 = self._conv_bn_relu(3, inplanes // 2, stride=2)
-        self.conv2 = self._conv_bn_relu(inplanes // 2, inplanes // 2)
-        self.conv3 = self._conv_bn_relu(inplanes // 2, inplanes)
+        self.conv1 = conv_bn_relu(3, inplanes // 2, stride=2)
+        self.conv2 = conv_bn_relu(inplanes // 2, inplanes // 2)
+        self.conv3 = conv_bn_relu(inplanes // 2, inplanes)
         self.pool1 = nn.MaxPool2d(3, padding=1, stride=2)
         # construct fish, resolution 56x56
         self.fish = Fish(block, **kwargs)
