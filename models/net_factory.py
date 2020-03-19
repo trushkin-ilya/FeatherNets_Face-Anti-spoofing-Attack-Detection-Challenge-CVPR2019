@@ -25,7 +25,7 @@ def fishnet150(**kwargs):
     if pretrained:
         path = './checkpoints/pre-trainedModels/fishnet150_ckpt.tar'
         state_dict = torch.load(path, map_location='cuda' if torch.cuda.is_available() else 'cpu')
-        model.load_state_dict(state_dict['state_dict'],strict=True)
+        model.load_state_dict(state_dict['state_dict']['module'],strict=True)
     model.conv1 = conv_bn_relu(5, 64 // 2, stride=2)
 
     model = torch.nn.DataParallel(model)
