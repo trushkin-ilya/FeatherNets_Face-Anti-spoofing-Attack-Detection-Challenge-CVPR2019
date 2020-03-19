@@ -24,7 +24,7 @@ def fishnet150(**kwargs):
     pretrained = True
     if pretrained:
         path = './checkpoints/pre-trainedModels/fishnet150_ckpt.tar'
-        state_dict = torch.load(path)
+        state_dict = torch.load(path, map_location='cuda' if torch.cuda.is_available() else 'cpu')
         model.load_state_dict(state_dict['state_dict'],strict=True)
     return model
 
