@@ -302,8 +302,8 @@ def validate(val_loader, model, criterion,epoch):
 
                 # measure accuracy and record loss
                 prec1,prec2 = accuracy(output.data, target_var,topk=(1,2))
-                losses.update(loss.data, input.size(0))
-                top1.update(prec1[0], input.size(0))
+                losses.update(loss.data, big_input.size(0))
+                top1.update(prec1[0], big_input.size(0))
 
                 soft_output = torch.softmax(output,dim=-1)
                 preds = soft_output.to('cpu').detach().numpy()
