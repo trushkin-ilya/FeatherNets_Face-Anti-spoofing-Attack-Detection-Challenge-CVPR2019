@@ -83,7 +83,7 @@ class InvertedResidual(nn.Module):
 
 
 class FeatherNet(nn.Module):
-    def __init__(self, n_class=2, input_size=224, se = False, avgdown=False, width_mult=1.):
+    def __init__(self, num_classes=2, input_size=224, se = False, avgdown=False, width_mult=1.):
         super(FeatherNet, self).__init__()
         block = InvertedResidual
         input_channel = 32
@@ -102,7 +102,7 @@ class FeatherNet(nn.Module):
         assert input_size % 32 == 0
         input_channel = int(input_channel * width_mult)
         self.last_channel = int(last_channel * width_mult) if width_mult > 1.0 else last_channel
-        self.features = [conv_bn(5, input_channel, 2)]
+        self.features = [conv_bn(3, input_channel, 2)]
         # building inverted residual blocks
         for t, c, n, s in interverted_residual_setting:
             output_channel = int(c * width_mult)
@@ -127,6 +127,7 @@ class FeatherNet(nn.Module):
         self.final_DW = nn.Sequential(nn.Conv2d(input_channel, input_channel, kernel_size=3, stride=2, padding=1,
                                   groups=input_channel, bias=False),
                                      )
+        self.fc = nn.Linear(last_channel, num_classes)
 
 
         self._initialize_weights()
@@ -134,8 +135,8 @@ class FeatherNet(nn.Module):
     def forward(self, x):
         x = self.features(x)
         x = self.final_DW(x)
-        
         x = x.view(x.size(0), -1)
+        x = self.fc(x)
         return x
 
     def _initialize_weights(self):
@@ -153,8 +154,8 @@ class FeatherNet(nn.Module):
                 m.weight.data.normal_(0, 0.01)
                 m.bias.data.zero_()
 
-def FeatherNetA():
-    model = FeatherNet(se = True)
+def FeatherNetA(**kwargs):
+    model = FeatherNet(se = True, **kwargs)
     return model
 
 def FeatherNetB():

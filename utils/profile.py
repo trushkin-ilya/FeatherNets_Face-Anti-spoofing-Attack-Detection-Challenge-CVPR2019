@@ -70,11 +70,11 @@ def calc_flops(model, input_size):
     foo(model)
     if '0.4.' in torch.__version__:
         if USE_GPU:
-            input = torch.cuda.FloatTensor(torch.rand(2, 5, input_size, input_size).cuda())
+            input = torch.cuda.FloatTensor(torch.rand(2, 3, input_size, input_size).cuda())
         else:
-            input = torch.FloatTensor(torch.rand(2, 5, input_size, input_size))
+            input = torch.FloatTensor(torch.rand(2, 3, input_size, input_size))
     else:
-        input = Variable(torch.rand(2, 5, input_size, input_size), requires_grad=True)
+        input = Variable(torch.rand(2, 3, input_size, input_size), requires_grad=True)
     _ = model(input)
 
     total_flops = (sum(list_conv) + sum(list_linear) + sum(list_bn) + sum(list_relu) + sum(list_pooling))

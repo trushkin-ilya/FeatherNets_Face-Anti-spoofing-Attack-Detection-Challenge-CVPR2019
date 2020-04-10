@@ -168,14 +168,14 @@ def main():
     img_size = args.input_size
 
     ratio = 224.0 / float(img_size)
-    train_dataset = CasiaSurfDataset(protocol=args.protocol, dir=args.data_dir, mode='train', transform=transforms.Compose([
+    train_dataset = CasiaSurfDataset(protocol=args.protocol, dir=args.data_dir, mode='train', depth=False, ir=False, transform=transforms.Compose([
             transforms.RandomResizedCrop(img_size),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             ColorAugmentation(),
             # normalize,
         ]))
-    val_dataset = CasiaSurfDataset(protocol=args.protocol, dir=args.data_dir, mode='dev', transform=transforms.Compose([
+    val_dataset = CasiaSurfDataset(protocol=args.protocol, dir=args.data_dir, mode='dev', depth=False, ir=False, transform=transforms.Compose([
             transforms.Resize(int(256 * ratio)),
             transforms.CenterCrop(img_size),
             transforms.ToTensor(),
