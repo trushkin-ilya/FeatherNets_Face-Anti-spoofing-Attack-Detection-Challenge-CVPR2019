@@ -24,7 +24,7 @@ import models
 from models.fishnet import conv_bn_relu
 from losses import *
 from tools.benchmark import compute_speed, stat
-from face_anti_spoofer.datasets import CasiaSurfDataset
+from ..datasets import CasiaSurfDataset
 
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith("__")
