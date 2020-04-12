@@ -212,8 +212,8 @@ def main():
         
         if not os.path.exists(args.save_path):
             os.mkdir(args.save_path)
-        save_name = '{}/{}_{}_best.pth.tar'.format(args.save_path, args.model_name, epoch) if is_best else\
-            '{}/{}_{}.pth.tar'.format(args.save_path, args.model_name, epoch)
+        save_name = '{}/{}_{}_best.pth'.format(args.save_path, args.model_name, epoch) if is_best else \
+            '{}/{}_{}.pth'.format(args.save_path, args.model_name, epoch)
         save_checkpoint({
             'epoch': epoch + 1,
             'arch': args.arch,
