@@ -1,0 +1,10 @@
+common:
+  arch: resnet18
+  policy: "step"
+  base_lr: 0.01
+  momentum: 0.9
+  weight_decay: 0.001
+  print_freq: 10
+  save_path: checkpoints/simple_conv
+model:
+  num_classes: 2
