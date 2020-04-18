@@ -166,13 +166,15 @@ def main():
     img_size = args.input_size
 
     ratio = 224.0 / float(img_size)
-    train_dataset = CasiaSurfDataset(protocol=args.protocol, dir=args.data_dir, mode='train', depth=False, ir=False, transform=transforms.Compose([
-            transforms.RandomResizedCrop(img_size),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            ColorAugmentation(),
-            # normalize,
-        ]))
+    train_dataset = torch.utils.data.ConcatDataset([CasiaSurfDataset(protocol=protocol, dir=args.data_dir, mode='train',
+                                                                     depth=False, ir=False,
+                                                                     transform=transforms.Compose([
+                                                                         transforms.RandomResizedCrop(img_size),
+                                                                         transforms.RandomHorizontalFlip(),
+                                                                         transforms.ToTensor(),
+                                                                         ColorAugmentation(),
+                                                                         # normalize,
+                                                                     ])) for protocol in [1, 2, 3]])
     val_dataset = CasiaSurfDataset(protocol=args.protocol, dir=args.data_dir, mode='dev', depth=False, ir=False, transform=transforms.Compose([
             transforms.Resize(int(256 * ratio)),
             transforms.CenterCrop(img_size),
@@ -180,7 +182,7 @@ def main():
             # normalize
         ]))
 
-    train_sampler = None
+    train_sampler = torch.utils.data.RandomSampler(train_dataset)
     val_sampler = None
 
     train_loader = torch.utils.data.DataLoader(
