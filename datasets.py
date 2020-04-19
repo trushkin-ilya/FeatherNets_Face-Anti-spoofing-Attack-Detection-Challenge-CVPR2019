@@ -21,18 +21,21 @@ class CasiaSurfDataset(Dataset):
                 if self.mode == 'train':
                     img_name, label = tuple(line[:-1].split(' '))
                     self.items.append((self.get_all_modalities(img_name, depth, ir), label))
+
                 elif self.mode == 'dev':
                     folder_name, label = tuple(line[:-1].split(' '))
                     profile_dir = os.path.join(self.dir, folder_name, 'profile')
                     for file in os.listdir(profile_dir):
                         img_name = os.path.join(folder_name, 'profile', file)
                         self.items.append((self.get_all_modalities(img_name, depth, ir), label))
+
                 elif self.mode == 'test':
                     folder_name = line[:-1].split(' ')[0]
                     profile_dir = os.path.join(self.dir, folder_name, 'profile')
                     for file in os.listdir(profile_dir):
                         img_name = os.path.join(folder_name, 'profile', file)
                         self.items.append((self.get_all_modalities(img_name, depth, ir), -1))
+
         self.transform = transform
 
     def __len__(self):
@@ -52,7 +55,7 @@ class CasiaSurfDataset(Dataset):
                 img = self.transform(img)
             images += [img]
 
-        return images, int(label)
+        return torch.cat(images, dim=1), int(label)
 
     def get_video_id(self, idx: int):
         img_name = self.items[idx][0]

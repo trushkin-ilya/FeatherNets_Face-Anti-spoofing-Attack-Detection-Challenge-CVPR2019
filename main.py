@@ -236,8 +236,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
     for i, (input, target) in enumerate(train_loader):
         # measure data loading time
         data_time.update(time.time() - end)
-        big_input = torch.cat(input, dim=1)
-        input_var = Variable(big_input).float().to(device)
+        input_var = Variable(input).float().to(device)
         target_var = Variable(target).long().to(device)
 
         # compute output
@@ -292,8 +291,7 @@ def validate(val_loader, model, criterion,epoch):
     with torch.no_grad():
         for i, (input, target) in enumerate(val_loader):
             with torch.no_grad():
-                big_input = torch.cat(input, dim=1)
-                input_var = Variable(big_input).float().to(device)
+                input_var = Variable(input).float().to(device)
                 target_var = Variable(target).long().to(device)
 
                 # compute output
@@ -302,8 +300,8 @@ def validate(val_loader, model, criterion,epoch):
 
                 # measure accuracy and record loss
                 prec1,prec2 = accuracy(output.data, target_var,topk=(1,2))
-                losses.update(loss.data, big_input.size(0))
-                top1.update(prec1[0], big_input.size(0))
+                losses.update(loss.data, input.size(0))
+                top1.update(prec1[0], input.size(0))
 
                 soft_output = torch.softmax(output,dim=-1)
                 preds = soft_output.to('cpu').detach().numpy()
