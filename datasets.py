@@ -2,9 +2,12 @@ import random
 import os
 import re
 import torch
+import numpy as np
 
 from torch.utils.data import Dataset
 from PIL import Image
+
+from torchvision.transforms import functional as F
 
 
 class CasiaSurfDataset(Dataset):
@@ -12,7 +15,8 @@ class CasiaSurfDataset(Dataset):
                  transform=None):
         self.dir = dir
         self.mode = mode
-        submode = {'train': 'train', 'dev': 'dev_ref', 'test': 'test_res'}[mode]
+        submode = {'train': 'train', 'dev': 'dev_ref',
+                   'test': 'test_res'}[mode]
         file_name = f'4@{protocol}_{submode}.txt'
         with open(os.path.join(dir, file_name), 'r') as file:
             lines = file.readlines()
@@ -20,21 +24,26 @@ class CasiaSurfDataset(Dataset):
             for line in lines:
                 if self.mode == 'train':
                     img_name, label = tuple(line[:-1].split(' '))
-                    self.items.append((self.get_all_modalities(img_name, depth, ir), label))
+                    self.items.append(
+                        (self.get_all_modalities(img_name, depth, ir), label))
 
                 elif self.mode == 'dev':
                     folder_name, label = tuple(line[:-1].split(' '))
-                    profile_dir = os.path.join(self.dir, folder_name, 'profile')
+                    profile_dir = os.path.join(
+                        self.dir, folder_name, 'profile')
                     for file in os.listdir(profile_dir):
                         img_name = os.path.join(folder_name, 'profile', file)
-                        self.items.append((self.get_all_modalities(img_name, depth, ir), label))
+                        self.items.append(
+                            (self.get_all_modalities(img_name, depth, ir), label))
 
                 elif self.mode == 'test':
                     folder_name = line[:-1].split(' ')[0]
-                    profile_dir = os.path.join(self.dir, folder_name, 'profile')
+                    profile_dir = os.path.join(
+                        self.dir, folder_name, 'profile')
                     for file in os.listdir(profile_dir):
                         img_name = os.path.join(folder_name, 'profile', file)
-                        self.items.append((self.get_all_modalities(img_name, depth, ir), -1))
+                        self.items.append(
+                            (self.get_all_modalities(img_name, depth, ir), -1))
 
         self.transform = transform
 
@@ -49,7 +58,8 @@ class CasiaSurfDataset(Dataset):
         images = []
         for img_name in img_names:
             img_path = os.path.join(self.dir, img_name)
-            img = Image.open(img_path).convert('RGB' if 'profile' in img_path else 'L')
+            img = Image.open(img_path).convert(
+                'RGB' if 'profile' in img_path else 'L')
             if self.transform:
                 random.seed(idx)
                 img = self.transform(img)
@@ -69,3 +79,15 @@ class CasiaSurfDataset(Dataset):
             result += [re.sub('profile', 'ir', img_path)]
 
         return result
+
+
+class NonZeroCrop(object):
+    """Cut out black regions.
+    """
+
+    def __call__(self, img):
+        arr = np.asarray(img)
+        pixels = np.transpose(arr.nonzero())[:, :-1]
+        top = pixels.min(axis=0)
+        h, w = pixels.max(axis=0) - top
+        return F.crop(img, top[0], top[1], h, w)
