@@ -65,7 +65,7 @@ class CasiaSurfDataset(Dataset):
                 img = self.transform(img)
             images += [img]
 
-        return torch.cat(images, dim=1), int(label)
+        return torch.cat(images, dim=0), int(label)
 
     def get_video_id(self, idx: int):
         img_name = self.items[idx][0]
@@ -87,7 +87,9 @@ class NonZeroCrop(object):
 
     def __call__(self, img):
         arr = np.asarray(img)
-        pixels = np.transpose(arr.nonzero())[:, :-1]
+        pixels = np.transpose(arr.nonzero())
+        if len(arr.shape) > 2:
+            pixels = pixels[:, :-1]
         top = pixels.min(axis=0)
         h, w = pixels.max(axis=0) - top
         return F.crop(img, top[0], top[1], h, w)
