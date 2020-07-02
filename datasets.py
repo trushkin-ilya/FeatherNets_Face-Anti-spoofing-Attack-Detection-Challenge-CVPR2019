@@ -7,7 +7,6 @@ import numpy as np
 from torch.utils.data import Dataset
 from PIL import Image
 
-from torchvision.transforms import functional as F
 
 
 class CasiaSurfDataset(Dataset):
@@ -81,15 +80,4 @@ class CasiaSurfDataset(Dataset):
         return result
 
 
-class NonZeroCrop(object):
-    """Cut out black regions.
-    """
 
-    def __call__(self, img):
-        arr = np.asarray(img)
-        pixels = np.transpose(arr.nonzero())
-        if len(arr.shape) > 2:
-            pixels = pixels[:, :-1]
-        top = pixels.min(axis=0)
-        h, w = pixels.max(axis=0) - top
-        return F.crop(img, top[0], top[1], h, w)
